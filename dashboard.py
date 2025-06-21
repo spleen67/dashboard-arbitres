@@ -28,9 +28,9 @@ df_filtre = df[df["DATE"] == pd.to_datetime(date_selectionnee)]
 # 🔍 Filtres supplémentaires
 st.sidebar.markdown("### 🎛️ Filtres avancés")
 
-# Nom
-noms = ["Tous"] + sorted(df_filtre["Nom"].unique())
-nom_filtre = st.sidebar.selectbox("Nom de famille :", noms)
+# Disposnibilité
+disponibilites = ["Tous"] + sorted(df_filtre["DISPONIBILITE"].unique())
+dispo_filtre = st.sidebar.selectbox("Disponibilité :", disponibilites)
 
 # Département
 departements = ["Tous"] + sorted(df_filtre["DPT DE RESIDENCE"].astype(str).unique())
@@ -41,8 +41,8 @@ clubs = ["Tous"] + sorted(df_filtre["CLUB NOM"].dropna().unique())
 club_filtre = st.sidebar.selectbox("Club :", clubs)
 
 # Application des filtres
-if nom_filtre != "Tous":
-    df_filtre = df_filtre[df_filtre["Nom"] == nom_filtre]
+if dispo_filtre != "Tous":
+    df_filtre = df_filtre[df_filtre["DISPONIBILITE"] == dispo_filtre]
 if dpt_filtre != "Tous":
     df_filtre = df_filtre[df_filtre["DPT DE RESIDENCE"].astype(str) == dpt_filtre]
 if club_filtre != "Tous":
