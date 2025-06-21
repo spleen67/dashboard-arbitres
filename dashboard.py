@@ -18,29 +18,29 @@ def charger_donnees_depuis_url():
 
 df = charger_donnees_depuis_url()
 
-# Barre latérale : sélection d'une date
+# Sélection de la date dans la barre latérale
 dates_disponibles = df["DATE"].sort_values().unique()
-date_selectionnee = st.sidebar.selectbox("Sélectionnez une date :", dates_disponibles)
+date_selectionnee = st.sidebar.selectbox("📅 Sélectionnez une date :", dates_disponibles)
 
-# Filtrage
+# On filtre par date
 df_filtre = df[df["DATE"] == pd.to_datetime(date_selectionnee)]
 
-# Filtres dynamiques
-st.sidebar.markdown("### 🔍 Filtres avancés")
+# 🔍 Filtres supplémentaires
+st.sidebar.markdown("### 🎛️ Filtres avancés")
 
 # Nom
-noms = ["Tous"] + sorted(df_filtre["Nom"].unique().tolist())
+noms = ["Tous"] + sorted(df_filtre["Nom"].unique())
 nom_filtre = st.sidebar.selectbox("Nom de famille :", noms)
 
 # Département
-departements = ["Tous"] + sorted(df_filtre["DPT DE RESIDENCE"].astype(str).unique().tolist())
+departements = ["Tous"] + sorted(df_filtre["DPT DE RESIDENCE"].astype(str).unique())
 dpt_filtre = st.sidebar.selectbox("Département :", departements)
 
 # Club
-clubs = ["Tous"] + sorted(df_filtre["CLUB NOM"].dropna().unique().tolist())
+clubs = ["Tous"] + sorted(df_filtre["CLUB NOM"].dropna().unique())
 club_filtre = st.sidebar.selectbox("Club :", clubs)
 
-# Appliquer les filtres
+# Application des filtres
 if nom_filtre != "Tous":
     df_filtre = df_filtre[df_filtre["Nom"] == nom_filtre]
 if dpt_filtre != "Tous":
@@ -48,9 +48,6 @@ if dpt_filtre != "Tous":
 if club_filtre != "Tous":
     df_filtre = df_filtre[df_filtre["CLUB NOM"] == club_filtre]
 
-
-# Filtrage
-df_filtre = df[df["DATE"] == pd.to_datetime(date_selectionnee)]
 
 # KPIs
 total = len(df_filtre)
