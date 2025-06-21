@@ -10,16 +10,44 @@ st.title("📅 Tableau de bord des disponibilités des arbitres")
 
 # Chargement des données
 @st.cache_data
-def charger_donnees():
-    df = pd.read_excel("data/RS_OVALE2-022.xlsx")
+def charger_donnees_depuis_url():
+    url = "https://docs.google.com/spreadsheets/d/113KAFUl9E4ceFqm-gIfQ-zhigYGnOGPh/export?format=xlsx"
+    df = pd.read_excel(url)
     df["DATE"] = pd.to_datetime(df["DATE"])
     return df
 
-df = charger_donnees()
+df = charger_donnees_depuis_url()
 
 # Barre latérale : sélection d'une date
 dates_disponibles = df["DATE"].sort_values().unique()
 date_selectionnee = st.sidebar.selectbox("Sélectionnez une date :", dates_disponibles)
+
+# Filtrage
+df_filtre = df[df["DATE"] == pd.to_datetime(date_selectionnee)]
+
+# Filtres dynamiques
+st.sidebar.markdown("### 🔍 Filtres avancés")
+
+# Nom
+noms = ["Tous"] + sorted(df_filtre["Nom"].unique().tolist())
+nom_filtre = st.sidebar.selectbox("Nom de famille :", noms)
+
+# Département
+departements = ["Tous"] + sorted(df_filtre["DPT DE RESIDENCE"].astype(str).unique().tolist())
+dpt_filtre = st.sidebar.selectbox("Département :", departements)
+
+# Club
+clubs = ["Tous"] + sorted(df_filtre["CLUB NOM"].dropna().unique().tolist())
+club_filtre = st.sidebar.selectbox("Club :", clubs)
+
+# Appliquer les filtres
+if nom_filtre != "Tous":
+    df_filtre = df_filtre[df_filtre["Nom"] == nom_filtre]
+if dpt_filtre != "Tous":
+    df_filtre = df_filtre[df_filtre["DPT DE RESIDENCE"].astype(str) == dpt_filtre]
+if club_filtre != "Tous":
+    df_filtre = df_filtre[df_filtre["CLUB NOM"] == club_filtre]
+
 
 # Filtrage
 df_filtre = df[df["DATE"] == pd.to_datetime(date_selectionnee)]
