@@ -60,8 +60,21 @@ col2.metric("Disponibles", dispo)
 col3.metric("Déjà désignés", designe)
 
 # Affichage du tableau
+# Fonction de style conditionnel
+def surligner_designation(row):
+    if row["DESIGNATION"] == 1:
+        return ['background-color: #ffe599'] * len(row)  # Jaune clair
+    else:
+        return [''] * len(row)
+
+# Colonnes à afficher
+colonnes = ["Nom", "PRENOM", "DPT DE RESIDENCE", "DISPONIBILITE", "DESIGNATION"]
+styled_df = df_filtre[colonnes].style.apply(surligner_designation, axis=1)
+
+# Affichage du tableau stylisé
 st.subheader("📋 Détails arbitres pour le {}".format(date_selectionnee.strftime('%d/%m/%Y')))
-st.dataframe(df_filtre[["Nom", "PRENOM", "DPT DE RESIDENCE", "DISPONIBILITE", "DESIGNATION"]])
+st.dataframe(styled_df, use_container_width=True)
+
 
 # Optionnel : graphique
 st.subheader("📊 Répartition des disponibilités")
