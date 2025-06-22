@@ -48,6 +48,15 @@ if dpt_filtre != "Tous":
 if club_filtre != "Tous":
     df_filtre = df_filtre[df_filtre["CLUB NOM"] == club_filtre]
 
+# ✅ Option de filtrage rapide
+filtrer_libres = st.sidebar.checkbox("🔎 Afficher uniquement les arbitres disponibles et non désignés")
+
+# Appliquer le filtre si coché
+if filtrer_libres:
+    df_filtre = df_filtre[
+        (df_filtre["DISPONIBILITE"] == "OUI") & (df_filtre["DESIGNATION"] == 0)
+    ]
+
 
 # KPIs
 total = len(df_filtre)
