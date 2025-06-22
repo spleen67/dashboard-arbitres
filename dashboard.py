@@ -57,6 +57,25 @@ if filtrer_libres:
         (df_filtre["DISPONIBILITE"] == "OUI") & (df_filtre["DESIGNATION"] == 0)
     ]
 
+# Initialisation d'un état si absent
+if "filtrer_libres" not in st.session_state:
+    st.session_state.filtrer_libres = False
+
+# Bouton pour afficher uniquement les arbitres disponibles et non désignés
+if st.sidebar.button("🎯 Arbitres disponibles et non désignés"):
+    st.session_state.filtrer_libres = True
+
+# Bouton pour réinitialiser le filtre
+if st.sidebar.button("↩️ Réinitialiser l'affichage"):
+    st.session_state.filtrer_libres = False
+
+# Appliquer le filtre si activé
+if st.session_state.filtrer_libres:
+    df_filtre = df_filtre[
+        (df_filtre["DISPONIBILITE"] == "OUI") & (df_filtre["DESIGNATION"] == 0)
+    ]
+
+
 
 # KPIs
 total = len(df_filtre)
