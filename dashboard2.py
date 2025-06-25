@@ -19,13 +19,13 @@ df = charger_donnees_depuis_url()
 
 
 
+
 # Nettoyage des colonnes
 df.columns = df.columns.str.strip().str.upper()
 df['DATE'] = pd.to_datetime(df['DATE'], errors='coerce').dt.date  # on garde uniquement la date
 
-# Nettoyage de la colonne DISPONIBILITE
+# Normalisation des valeurs de DISPONIBILITE
 df['DISPONIBILITE'] = df['DISPONIBILITE'].astype(str).str.strip().str.upper()
-df['DISPONIBILITE'] = df['DISPONIBILITE'].apply(lambda x: "OUI" if "DISPONIBLE" in x and "INDISPONIBLE" not in x else "NON")
 
 # Pivot du tableau
 pivot = df.pivot_table(
@@ -43,3 +43,4 @@ pivot.reset_index(inplace=True)
 # Affichage Streamlit
 st.title("Disponibilité des arbitres par jour")
 st.dataframe(pivot)
+
