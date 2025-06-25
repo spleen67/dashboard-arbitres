@@ -28,13 +28,7 @@ df['DATE'] = pd.to_datetime(df['DATE'], errors='coerce').dt.date
 df['DISPONIBILITE'] = df['DISPONIBILITE'].astype(str).str.strip().str.upper()
 
 # Pivot du tableau
-pivot = df.pivot_table(
-    index=['NOM', 'PRENOM'],
-    columns='DATE',
-    values='DISPONIBILITE',
-    aggfunc='first',
-    fill_value='NON'
-)
+pivot = df.pivot_table(index=['NOM', 'PRENOM'], columns='DATE', values='DISPONIBILITE', aggfunc='first', fill_value='NON')
 
 # Formatage des dates en colonnes (format FR)
 pivot.columns = [pd.to_datetime(date).strftime('%d/%m/%Y') for date in pivot.columns]
