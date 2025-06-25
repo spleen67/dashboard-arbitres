@@ -29,13 +29,7 @@ df['DISPONIBILITE'] = df['DISPONIBILITE'].str.strip().str.upper()
 df['DISPONIBILITE'] = df['DISPONIBILITE'].apply(lambda x: "OUI" if "DISPONIBLE" in x else "NON")
 
 # Pivot du tableau
-pivot = df.pivot_table(
-    index=['NOM', 'PRENOM'],
-    columns='DATE',
-    values='DISPONIBILITE',
-    aggfunc='first',
-    fill_value='NON'
-)
+pivot = df.pivot_table(index=['NOM', 'PRENOM'], columns='DATE', values='DISPONIBILITE', aggfunc='first', fill_value='NON')
 
 # Formatage des dates en colonnes (format FR)
 pivot.columns = [date.strftime('%d/%m/%Y') for date in pivot.columns]
