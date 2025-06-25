@@ -19,7 +19,7 @@ df = charger_donnees_depuis_url()
 
 
 # Nettoyage des colonnes
-df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+df['DATE'] = pd.to_datetime(df['DATE'], errors='coerce')
 df['DISPONIBILITE'] = df['DISPONIBILITE'].str.upper().str.strip()
 
 # Transformation : pivot table
@@ -28,7 +28,7 @@ df['DISPONIBILITE'] = df['DISPONIBILITE'].apply(lambda x: "OUI" if x == "DISPONI
 # Création du tableau pivoté
 pivot = df.pivot_table(
     index=['Nom', 'PRENOM'],
-    columns='Date',
+    columns='DATE',
     values='DISPONIBILITE',
     aggfunc='first',
     fill_value='NON'
