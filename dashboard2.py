@@ -43,7 +43,7 @@ else:
     st.stop()
 
 # Vérification des colonnes nécessaires
-colonnes_requises = ['NOM', 'PRENOM', 'CATEGORIE', 'CODE CLUB', 'DATE', 'DISPONIBILITE']
+colonnes_requises = ['NOM', 'PRENOM', 'CATEGORIE_y', 'CODE CLUB', 'DATE', 'DISPONIBILITE']
 colonnes_manquantes = [col for col in colonnes_requises if col not in df.columns]
 
 if colonnes_manquantes:
@@ -53,7 +53,7 @@ if colonnes_manquantes:
 
 # Création du tableau pivoté
 pivot = df.pivot_table(
-    index=['NOM', 'PRENOM', 'CATEGORIE', 'CODE CLUB'],
+    index=['NOM', 'PRENOM', 'CATEGORIE_y', 'CODE CLUB'],
     columns='DATE',
     values='DISPONIBILITE',
     aggfunc='first',
