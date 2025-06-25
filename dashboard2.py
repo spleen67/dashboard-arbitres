@@ -3,9 +3,9 @@ import pandas as pd
 import unicodedata
 
 st.set_page_config(page_title="Disponibilités des arbitres", layout="wide")
-st.title("📅 Tableau de bord des disponibilités des arbitres")
+st.title("Tableau de bord des disponibilités des arbitres")
 
-# 🔤 Fonction de nettoyage des noms de colonnes
+# Fonction de nettoyage des noms de colonnes
 def nettoyer_colonnes(df):
     df.columns = [
         unicodedata.normalize('NFKD', col).encode('ascii', errors='ignore').decode('utf-8').strip().upper()
@@ -13,7 +13,7 @@ def nettoyer_colonnes(df):
     ]
     return df
 
-# 📥 Chargement des données
+# Chargement des données depuis Google Sheets
 @st.cache_data
 def charger_disponibilites():
     url = "https://docs.google.com/spreadsheets/d/113KAFUl9E4ceFqm-gIfQ-zhigYGnOGPh/export?format=xlsx"
@@ -31,27 +31,27 @@ def charger_arbitres():
     df = nettoyer_colonnes(df)
     return df[['NUMERO AFFILIATION', 'CATEGORIE', 'CODE CLUB']]
 
-# Chargement
+# Chargement des données
 df_dispo = charger_disponibilites()
 df_arbitres = charger_arbitres()
 
-# 🔗 Fusion
+# Fusion des données
 if 'NO LICENCE' in df_dispo.columns:
     df = pd.merge(df_dispo, df_arbitres, left_on='NO LICENCE', right_on='NUMERO AFFILIATION', how='left')
 else:
-    st.error("❌ La colonne 'NO LICENCE' est introuvable dans le fichier de disponibilités.")
+    st.error("La colonne 'NO LICENCE' est introuvable dans le fichier de disponibilités.")
     st.stop()
 
-# 🧱 Vérification des colonnes avant pivot
+# Vérification des colonnes nécessaires
 colonnes_requises = ['NOM', 'PRENOM', 'CATEGORIE', 'CODE CLUB', 'DATE', 'DISPONIBILITE']
 colonnes_manquantes = [col for col in colonnes_requises if col not in df.columns]
 
 if colonnes_manquantes:
-    st.error(f"❌ Colonnes manquantes pour le tableau : {', '.join(colonnes_manquantes)}")
+    st.error(f"Colonnes manquantes pour le tableau : {', '.join(colonnes_manquantes)}")
     st.write("Colonnes disponibles :", df.columns.tolist())
     st.stop()
 
-# 📊 Création du tableau pivoté
+# Création du tableau pivoté
 pivot = df.pivot_table(
     index=['NOM', 'PRENOM', 'CATEGORIE', 'CODE CLUB'],
     columns='DATE',
@@ -60,9 +60,9 @@ pivot = df.pivot_table(
     fill_value='☑️'
 )
 
-# 📅 Formatage des dates en colonnes (format FR)
+# Formatage des dates en colonnes (format FR)
 pivot.columns = [pd.to_datetime(date).strftime('%d/%m/%Y') for date in pivot.columns]
 pivot.reset_index(inplace=True)
 
-# 📋 Affichage
+# Affichage du tableau
 st.dataframe(pivot, use_container_width=True)
