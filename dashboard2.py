@@ -17,7 +17,7 @@ def charger_disponibilites():
 
 @st.cache_data
 def charger_arbitres():
-    url = "https://docs.google.com/spreadsheets/d/1UUZBFPMCkVGzVKeTP_D44ZpGwTHlu0Q0/export?format=xlsx"  # Remplace par le bon lien
+    url = "https://docs.google.com/spreadsheets/d/1UUZBFPMCkVGzVKeTP_D44ZpGwTHlu0Q0/export?format=xlsx"
     df = pd.read_excel(url)
     df.columns = df.columns.str.strip().str.upper()
     return df[['NUMÉRO AFFILIATION', 'CATÉGORIE', 'CODE CLUB']]
@@ -27,7 +27,7 @@ df_dispo = charger_disponibilites()
 df_arbitres = charger_arbitres()
 
 # 🔗 Fusion des données
-df = pd.merge(df_dispo, df_arbitres, left_on='NO LICENCE', right_on='Numéro Affiliation', how='left')
+df = pd.merge(df_dispo, df_arbitres, left_on='NO LICENCE', right_on='NUMÉRO AFFILIATION', how='left')
 
 # 🧱 Création du tableau pivoté
 pivot = df.pivot_table(
@@ -38,7 +38,7 @@ pivot = df.pivot_table(
     fill_value='☑️'
 )
 
-# 📅 Formatage des dates en colonnes (FR)
+# 📅 Formatage des dates en colonnes (format FR)
 pivot.columns = [pd.to_datetime(date).strftime('%d/%m/%Y') for date in pivot.columns]
 pivot.reset_index(inplace=True)
 
