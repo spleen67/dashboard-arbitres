@@ -30,13 +30,8 @@ df_arbitres = charger_arbitres()
 df = pd.merge(df_dispo, df_arbitres, left_on='NO LICENCE', right_on='NUMÉRO AFFILIATION', how='left')
 
 # 🧱 Création du tableau pivoté
-pivot = df.pivot_table(
-    index=['NOM', 'PRÉNOM', 'CATÉGORIE', 'CODE CLUB'],
-    columns='DATE',
-    values='DISPONIBILITE',
-    aggfunc='first',
-    fill_value='☑️'
-)
+pivot = df.pivot_table(index=['NOM', 'PRÉNOM', 'CATÉGORIE', 'CODE CLUB'],columns='DATE',values='DISPONIBILITE',aggfunc='first',fill_value='☑️')
+
 
 # 📅 Formatage des dates en colonnes (format FR)
 pivot.columns = [pd.to_datetime(date).strftime('%d/%m/%Y') for date in pivot.columns]
