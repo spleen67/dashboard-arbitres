@@ -31,7 +31,7 @@ def charger_arbitres():
     df = nettoyer_colonnes(df)
     return df[['NUMERO AFFILIATION', 'CATEGORIE', 'CODE CLUB']]
 
-# 📊 Chargement
+# Chargement
 df_dispo = charger_disponibilites()
 df_arbitres = charger_arbitres()
 
