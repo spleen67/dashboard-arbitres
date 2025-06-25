@@ -18,26 +18,29 @@ def charger_donnees_depuis_url():
 df = charger_donnees_depuis_url()
 
 
+
 # Nettoyage des colonnes
-df['DATE'] = pd.to_datetime(df['DATE'], errors='coerce')
-df['DISPONIBILITE'] = df['DISPONIBILITE'].str.upper().str.strip()
+df.columns = df.columns.str.strip().str.upper()
+df['DATE'] = pd.to_datetime(df['DATE'], errors='coerce').dt.date  # on garde uniquement la date
+df['DISPONIBILITE'] = df['DISPONIBILITE'].str.strip().str.upper()
 
-# Transformation : pivot table
-df['DISPONIBILITE'] = df['DISPONIBILITE'].apply(lambda x: "OUI" if x == "DISPONIBLE" else "NON")
+# Transformation : "DISPONIBLE" → "OUI", sinon "NON"
+df['DISPONIBILITE'] = df['DISPONIBILITE'].apply(lambda x: "OUI" if "DISPONIBLE" in x else "NON")
 
-# Création du tableau pivoté
+# Pivot du tableau
 pivot = df.pivot_table(
-    index=['Nom', 'PRENOM'],
-    columns='DATE',
-    values='DISPONIBILITE',
-    aggfunc='first',
-    fill_value='NON'
+    index=['NOM', 'PRENOM'],
+    columns='DATE',
+    values='DISPONIBILITE',
+    aggfunc='first',
+    fill_value='NON'
 )
 
-# Remise en forme
+# Formatage des dates en colonnes (format FR)
+pivot.columns = [date.strftime('%d/%m/%Y') for date in pivot.columns]
 pivot.reset_index(inplace=True)
-pivot.columns.name = None  # Supprime le nom de l'index des colonnes
 
 # Affichage Streamlit
-st.title("Disponibilité par personne et par jour")
+st.title("Disponibilité des arbitres par jour")
 st.dataframe(pivot)
+
