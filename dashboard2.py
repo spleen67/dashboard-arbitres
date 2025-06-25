@@ -27,7 +27,7 @@ df_dispo = charger_disponibilites()
 df_arbitres = charger_arbitres()
 
 # 🔗 Fusion des données
-df = pd.merge(df_dispo, df_arbitres, left_on='NUMÉRO AFFILIATION', right_on='NUMÉRO AFFILIATION', how='left')
+df = pd.merge(df_dispo, df_arbitres, left_on='NO LICENCE', right_on='Numéro Affiliation', how='left')
 
 # 🧱 Création du tableau pivoté
 pivot = df.pivot_table(
