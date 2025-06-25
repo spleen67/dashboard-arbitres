@@ -22,7 +22,7 @@ df = charger_donnees_depuis_url()
 
 # Nettoyage des colonnes
 df.columns = df.columns.str.strip().str.upper()
-df['DATE'] = pd.to_datetime(df['DATE'], errors='coerce').dt.date  # on garde uniquement la date
+df['DATE'] = pd.to_datetime(df['DATE'], errors='coerce').dt.date
 
 # Normalisation des valeurs de DISPONIBILITE
 df['DISPONIBILITE'] = df['DISPONIBILITE'].astype(str).str.strip().str.upper()
