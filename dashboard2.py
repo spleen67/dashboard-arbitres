@@ -21,7 +21,8 @@ df = charger_donnees_depuis_url()
 
 # Nettoyage des colonnes
 df.columns = df.columns.str.strip().str.upper()
-df['DATE'] = pd.to_datetime(df['DATE'], errors='coerce').dt.date  # on garde uniquement la date
+df['DATE'] = pd.to_datetime(df['DATE'], errors='coerce').dt.date
+# on garde uniquement la date
 df['DISPONIBILITE'] = df['DISPONIBILITE'].str.strip().str.upper()
 
 # Transformation : "DISPONIBLE" → "OUI", sinon "NON"
