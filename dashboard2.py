@@ -27,8 +27,13 @@ df['DATE'] = pd.to_datetime(df['DATE'], errors='coerce').dt.date
 # Normalisation des valeurs de DISPONIBILITE
 df['DISPONIBILITE'] = df['DISPONIBILITE'].astype(str).str.strip().str.upper()
 
+
+# Remplacement par icônes
+df['DISPONIBILITE'] = df['DISPONIBILITE'].apply(lambda x: "✅" if x == "OUI" else "☑️")
+
+
 # Pivot du tableau
-pivot = df.pivot_table(index=['NOM', 'PRENOM'], columns='DATE', values='DISPONIBILITE', aggfunc='first', fill_value='NON')
+pivot = df.pivot_table(index=['NOM', 'PRENOM'], columns='DATE', values='DISPONIBILITE', aggfunc='first', fill_value='☑️')
 
 # Formatage des dates en colonnes (format FR)
 pivot.columns = [pd.to_datetime(date).strftime('%d/%m/%Y') for date in pivot.columns]
