@@ -3,7 +3,7 @@ import pandas as pd
 import unicodedata
 
 st.set_page_config(page_title="Disponibilités des arbitres", layout="wide")
-st.title("Tableau de bord des disponibilités des arbitres")
+st.title("📆 Tableau de bord des disponibilités des arbitres")
 
 # Fonction de nettoyage des noms de colonnes
 def nettoyer_colonnes(df):
