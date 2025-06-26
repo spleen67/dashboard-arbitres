@@ -43,7 +43,7 @@ def charger_disponibilites():
     return df
 
 # Chargement des données
-rencontres = charger_rencontres()
+# rencontres = charger_rencontres()
 competitions = charger_competitions()
 categories = charger_categories()
 disponibilites = charger_disponibilites()
