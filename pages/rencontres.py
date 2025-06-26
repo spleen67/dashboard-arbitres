@@ -58,6 +58,9 @@ if rencontre_id:
 
     # Extraction des infos
     competition = ligne.iloc[0]['COMPETITION NOM']
+    
+    st.write("Colonnes disponibles dans la ligne sélectionnée :", ligne.columns.tolist())
+
     categorie = ligne.iloc[0]['CATEGORIE']
     date_rencontre = ligne.iloc[0]['DATE'] if 'DATE' in ligne.columns else None
 
