@@ -50,10 +50,10 @@ disponibilites = charger_disponibilites()
 
 # Sélection d'une rencontre
 st.subheader("Sélectionnez une rencontre")
-rencontre_id = st.selectbox("Rencontre :", rencontres['ID'].unique() if 'ID' in rencontres.columns else rencontres.index)
+rencontre_id = st.selectbox("Rencontre :", rencontres['RENCONTRE NUMERO'].unique())
 
 if rencontre_id:
-    ligne = rencontres[rencontres['ID'] == rencontre_id] if 'ID' in rencontres.columns else rencontres.loc[[rencontre_id]]
+    ligne = rencontres[rencontres['RENCONTRE NUMERO'] == rencontre_id]
     st.write("Détails de la rencontre sélectionnée :", ligne)
 
     # Extraction des infos
