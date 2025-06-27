@@ -86,21 +86,24 @@ def charger_disponibilites():
     df['DISPONIBILITE'] = df['DISPONIBILITE'].apply(lambda x: "OUI" if x == "OUI" else "NON")
     return df
 
-# Chargement
-rencontres = charger_rencontres()
-arbitres = charger_arbitres()
-disponibilites = charger_disponibilites()
+# Fonction principale
+def afficher_affectation():
+    rencontres = charger_rencontres()
+    arbitres = charger_arbitres()
+    disponibilites = charger_disponibilites()
 
-# Sélection d'une rencontre
-st.subheader("Sélectionnez une rencontre")
-rencontre_id = st.selectbox("Rencontre :", rencontres['RENCONTRE NUMERO'].unique())
+    st.subheader("Sélectionnez une rencontre")
+    rencontre_id = st.selectbox("Rencontre :", rencontres['RENCONTRE NUMERO'].unique())
 
-if rencontre_id:
+    if not rencontre_id:
+        st.info("Veuillez sélectionner une rencontre.")
+        return
+
     ligne = rencontres[rencontres['RENCONTRE NUMERO'] == rencontre_id]
 
     if ligne.empty:
         st.error("Aucune ligne trouvée pour cette rencontre. Vérifiez que le numéro est correct.")
-        st.stop()
+        return
 
     st.write("Détails de la rencontre :", ligne)
 
@@ -110,7 +113,7 @@ if rencontre_id:
     niveau_min, niveau_max = niveau_competitions.get(competition, (None, None))
     if niveau_min is None or niveau_max is None:
         st.warning("Compétition non reconnue dans la table des niveaux.")
-        st.stop()
+        return
 
     st.markdown(f"Niveau requis pour cette compétition : **{niveau_min} → {niveau_max}**")
 
@@ -130,3 +133,6 @@ if rencontre_id:
         st.dataframe(arbitres_eligibles[['NOM', 'PRENOM', 'NO LICENCE', 'CATEGORIE', 'NIVEAU']])
     else:
         st.warning("Aucun arbitre disponible et compatible avec le niveau requis.")
+
+# Lancer l'application
+afficher_affectation()
