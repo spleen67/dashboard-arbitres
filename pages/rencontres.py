@@ -94,7 +94,6 @@ disponibilites = charger_disponibilites()
 # Sélection d'une rencontre
 st.subheader("Sélectionnez une rencontre")
 rencontre_id = st.selectbox("Rencontre :", rencontres['RENCONTRE NUMERO'].unique())
-st.write("Colonnes disponibles dans la ligne sélectionnée :", ligne.columns.tolist())
 
 if rencontre_id:
     ligne = rencontres[rencontres['RENCONTRE NUMERO'] == rencontre_id]
