@@ -13,7 +13,7 @@ def nettoyer_colonnes(df):
     ]
     return df
 
-# Table de correspondance CATEGORIE → NIVEAU
+# Table CATEGORIE → NIVEAU
 categorie_niveau = {
     "INTERNATIONAUX": 1,
     "2EME DIVISION PRO": 2,
@@ -33,16 +33,40 @@ categorie_niveau = {
     "MINEURS 15 ANS": 16
 }
 
+# Table COMPETITION NOM → (NIVEAU MIN, NIVEAU MAX)
+niveau_competitions = {
+    "ELITE 1 FEMININE": (6, 4),
+    "ELITE 2 FEMININE": (7, 6),
+    "ELITE ALAMERCERY": (7, 6),
+    "ELITE CRABOS": (6, 4),
+    "ESPOIRS FEDERAUX": (6, 4),
+    "EUROPEAN RUGBY CHAMPIONS CUP": (1, 1),
+    "EXCELLENCE B - CHAMPIONNAT DE FRANCE": (9, 7),
+    "FEDERALE 1": (6, 6),
+    "FEDERALE 2": (7, 7),
+    "FEDERALE 3": (8, 8),
+    "FEDERALE B - CHAMPIONNAT DE FRANCE": (9, 7),
+    "FEMININES MOINS DE 18 ANS A XV - ELITE": (7, 6),
+    "FEMININES REGIONALES A X": (13, 10),
+    "FEMININES REGIONALES A X « MOINS DE 18 ANS »": (14, 13),
+    "REGIONAL 1 U16": (15, 9),
+    "REGIONAL 1 U19": (10, 9),
+    "REGIONAL 2 U16": (15, 9),
+    "REGIONAL 2 U19": (13, 9),
+    "REGIONAL 3 U16": (15, 9),
+    "REGIONAL 3 U19": (13, 9),
+    "REGIONALE 1 - CHAMPIONNAT TERRITORIAL": (9, 7),
+    "REGIONALE 2 - CHAMPIONNAT TERRITORIAL": (11, 9),
+    "REGIONALE 3 - CHAMPIONNAT TERRITORIAL": (13, 9),
+    "RESERVES ELITE": (7, 6),
+    "RESERVES REGIONALES 1 - CHAMPIONNAT TERRITORIAL": (11, 9),
+    "RESERVES REGIONALES 2 - CHAMPIONNAT TERRITORIAL": (13, 11)
+}
+
 # Chargement des données
 @st.cache_data
 def charger_rencontres():
     url = "https://docs.google.com/spreadsheets/d/1cM3QiYhiu22sKSgYKvpahvNWJqlxSk-e/export?format=xlsx"
-    df = pd.read_excel(url)
-    return nettoyer_colonnes(df)
-
-@st.cache_data
-def charger_competitions():
-    url = "https://docs.google.com/spreadsheets/d/1MWcMkyto3FWgG8cNL2Rfpc_LSX26Bfug/export?format=xlsx"
     df = pd.read_excel(url)
     return nettoyer_colonnes(df)
 
@@ -64,7 +88,6 @@ def charger_disponibilites():
 
 # Chargement
 rencontres = charger_rencontres()
-competitions = charger_competitions()
 categories = charger_categories()
 disponibilites = charger_disponibilites()
 
@@ -75,26 +98,19 @@ rencontre_id = st.selectbox("Rencontre :", rencontres['RENCONTRE NUMERO'].unique
 if rencontre_id:
     ligne = rencontres[rencontres['RENCONTRE NUMERO'] == rencontre_id]
     st.write("Détails de la rencontre :", ligne)
-    
-    st.write("Colonnes disponibles dans la ligne sélectionnée :", ligne.columns.tolist())
 
-
-    competition = ligne.iloc[0]['COMPETITION NOM']
-    categorie = ligne.iloc[0]['CATEGORIE']
+    competition = ligne.iloc[0]['COMPETITION NOM'].strip().upper()
     date_rencontre = ligne.iloc[0]['DATE']
 
-    # Récupération du niveau requis pour la compétition
-    filtre = (competitions['COMPETITION NOM'] == competition) & (competitions['CATEGORIE'] == categorie)
-    niveau_min = competitions[filtre]['NIVEAU MIN'].values[0] if not competitions[filtre].empty else None
-    niveau_max = competitions[filtre]['NIVEAU MAX'].values[0] if not competitions[filtre].empty else None
-
-    st.markdown(f"Niveau requis pour cette rencontre : **{niveau_min} → {niveau_max}**")
+    # Récupération du niveau requis
+    niveau_min, niveau_max = niveau_competitions.get(competition, (None, None))
+    st.markdown(f"Niveau requis pour cette compétition : **{niveau_min} → {niveau_max}**")
 
     # Arbitres disponibles à la date
     dispo_date = disponibilites[disponibilites['DATE'] == date_rencontre]
     dispo_oui = dispo_date[dispo_date['DISPONIBILITE'] == "OUI"]
 
-    # Ajout du niveau arbitre depuis la table des catégories
+    # Ajout du niveau arbitre
     categories['CATEGORIE'] = categories['CATEGORIE'].str.upper()
     categories['NIVEAU'] = categories['CATEGORIE'].map(categorie_niveau)
     arbitres = pd.merge(dispo_oui, categories[['NUMERO AFFILIATION', 'NIVEAU']], 
