@@ -75,6 +75,9 @@ rencontre_id = st.selectbox("Rencontre :", rencontres['RENCONTRE NUMERO'].unique
 if rencontre_id:
     ligne = rencontres[rencontres['RENCONTRE NUMERO'] == rencontre_id]
     st.write("Détails de la rencontre :", ligne)
+    
+    st.write("Colonnes disponibles dans la ligne sélectionnée :", ligne.columns.tolist())
+
 
     competition = ligne.iloc[0]['COMPETITION NOM']
     categorie = ligne.iloc[0]['CATEGORIE']
