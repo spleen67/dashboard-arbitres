@@ -13,7 +13,27 @@ def nettoyer_colonnes(df):
     ]
     return df
 
-# Chargement des fichiers Google Sheets
+# Table de correspondance CATEGORIE → NIVEAU
+categorie_niveau = {
+    "INTERNATIONAUX": 1,
+    "2EME DIVISION PRO": 2,
+    "NATIONALE 1 ET 2": 3,
+    "ARBITRES ASSISTANTS PRO": 4,
+    "ARBITRES ASSISTANTS NAT": 5,
+    "DIVISIONNAIRES 1": 6,
+    "DIVISIONNAIRES 2": 7,
+    "DIVISIONNAIRES 3": 8,
+    "LIGUE 1": 9,
+    "LIGUE 2": 10,
+    "LIGUE 3": 11,
+    "LIGUE 4": 12,
+    "LIGUE 5": 13,
+    "MINEURS 17 ANS": 14,
+    "MINEURS 16 ANS": 15,
+    "MINEURS 15 ANS": 16
+}
+
+# Chargement des données
 @st.cache_data
 def charger_rencontres():
     url = "https://docs.google.com/spreadsheets/d/1cM3QiYhiu22sKSgYKvpahvNWJqlxSk-e/export?format=xlsx"
@@ -42,7 +62,7 @@ def charger_disponibilites():
     df['DISPONIBILITE'] = df['DISPONIBILITE'].apply(lambda x: "OUI" if x == "OUI" else "NON")
     return df
 
-# Chargement des données
+# Chargement
 rencontres = charger_rencontres()
 competitions = charger_competitions()
 categories = charger_categories()
@@ -54,33 +74,32 @@ rencontre_id = st.selectbox("Rencontre :", rencontres['RENCONTRE NUMERO'].unique
 
 if rencontre_id:
     ligne = rencontres[rencontres['RENCONTRE NUMERO'] == rencontre_id]
-    st.write("Détails de la rencontre sélectionnée :", ligne)
+    st.write("Détails de la rencontre :", ligne)
 
-    st.write("Colonnes disponibles dans la ligne sélectionnée :", ligne.columns.tolist())
-    
-    # Extraction des infos
     competition = ligne.iloc[0]['COMPETITION NOM']
     categorie = ligne.iloc[0]['CATEGORIE']
-    date_rencontre = ligne.iloc[0]['DATE'] if 'DATE' in ligne.columns else None
+    date_rencontre = ligne.iloc[0]['DATE']
 
-    # Niveau requis
+    # Récupération du niveau requis pour la compétition
     filtre = (competitions['COMPETITION NOM'] == competition) & (competitions['CATEGORIE'] == categorie)
     niveau_min = competitions[filtre]['NIVEAU MIN'].values[0] if not competitions[filtre].empty else None
     niveau_max = competitions[filtre]['NIVEAU MAX'].values[0] if not competitions[filtre].empty else None
 
-    st.markdown(f"**Niveau requis :** {niveau_min} → {niveau_max}")
+    st.markdown(f"Niveau requis pour cette rencontre : **{niveau_min} → {niveau_max}**")
 
-    # Arbitres disponibles à cette date
+    # Arbitres disponibles à la date
     dispo_date = disponibilites[disponibilites['DATE'] == date_rencontre]
     dispo_oui = dispo_date[dispo_date['DISPONIBILITE'] == "OUI"]
 
-    # Ajout du niveau arbitre
+    # Ajout du niveau arbitre depuis la table des catégories
+    categories['CATEGORIE'] = categories['CATEGORIE'].str.upper()
+    categories['NIVEAU'] = categories['CATEGORIE'].map(categorie_niveau)
     arbitres = pd.merge(dispo_oui, categories[['NUMERO AFFILIATION', 'NIVEAU']], 
                         left_on='NO LICENCE', right_on='NUMERO AFFILIATION', how='left')
 
-    # Filtrage par niveau
+    # Filtrage des arbitres compatibles
     arbitres_eligibles = arbitres[
-        arbitres['NIVEAU'].apply(lambda x: niveau_min <= str(x) <= niveau_max if pd.notna(x) else False)
+        arbitres['NIVEAU'].apply(lambda x: niveau_min <= x <= niveau_max if pd.notna(x) else False)
     ]
 
     st.subheader("Arbitres proposés")
