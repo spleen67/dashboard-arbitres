@@ -15,7 +15,7 @@ def nettoyer_colonnes(df):
 
 # Table CATEGORIE → NIVEAU
 categorie_niveau = {
-    "INTERNATIONAUX": 1,
+    "INTERNATIONNAUX": 1,
     "2EME DIVISION PRO": 2,
     "NATIONALE 1 ET 2": 3,
     "ARBITRES ASSISTANTS PRO": 4,
@@ -97,38 +97,36 @@ rencontre_id = st.selectbox("Rencontre :", rencontres['RENCONTRE NUMERO'].unique
 
 if rencontre_id:
     ligne = rencontres[rencontres['RENCONTRE NUMERO'] == rencontre_id]
+
     if ligne.empty:
-        st.error("Aucune rencontre trouvée pour ce numéro. Vérifiez les données.")
+        st.error("Aucune ligne trouvée pour cette rencontre. Vérifiez que le numéro est correct.")
+        st.stop()
+
+    st.write("Détails de la rencontre :", ligne)
+
+    competition = ligne.iloc[0]['COMPETITION NOM'].strip().upper()
+    date_rencontre = ligne.iloc[0]['DATE']
+
+    niveau_min, niveau_max = niveau_competitions.get(competition, (None, None))
+    if niveau_min is None or niveau_max is None:
+        st.warning("Compétition non reconnue dans la table des niveaux.")
+        st.stop()
+
+    st.markdown(f"Niveau requis pour cette compétition : **{niveau_min} → {niveau_max}**")
+
+    dispo_date = disponibilites[disponibilites['DATE'] == date_rencontre]
+    dispo_oui = dispo_date[dispo_date['DISPONIBILITE'] == "OUI"]
+
+    arbitres_dispo = pd.merge(dispo_oui, arbitres, left_on='NO LICENCE', right_on='NUMERO AFFILIATION', how='left')
+    arbitres_dispo['CATEGORIE'] = arbitres_dispo['CATEGORIE'].str.upper()
+    arbitres_dispo['NIVEAU'] = arbitres_dispo['CATEGORIE'].map(categorie_niveau)
+
+    arbitres_eligibles = arbitres_dispo[
+        arbitres_dispo['NIVEAU'].apply(lambda x: niveau_min <= x <= niveau_max if pd.notna(x) else False)
+    ]
+
+    st.subheader("Arbitres proposés")
+    if not arbitres_eligibles.empty:
+        st.dataframe(arbitres_eligibles[['NOM', 'PRENOM', 'NO LICENCE', 'CATEGORIE', 'NIVEAU']])
     else:
-        st.write("Détails de la rencontre :", ligne)
-        competition = ligne.iloc[0]['COMPETITION NOM'].strip().upper()
-        date_rencontre = ligne.iloc[0]['DATE']
-
-        # Récupération du niveau requis
-        niveau_min, niveau_max = niveau_competitions.get(competition, (None, None))
-        if niveau_min is None or niveau_max is None:
-            st.warning("Compétition non reconnue dans la table des niveaux.")
-        else:
-            st.markdown(f"Niveau requis pour cette compétition : **{niveau_min} → {niveau_max}**")
-
-            # Arbitres disponibles à la date
-            dispo_date = disponibilites[disponibilites['DATE'] == date_rencontre]
-            dispo_oui = dispo_date[dispo_date['DISPONIBILITE'] == "OUI"]
-
-            # Jointure avec la table des arbitres
-            arbitres_dispo = pd.merge(dispo_oui, arbitres, left_on='NO LICENCE', right_on='NUMERO AFFILIATION', how='left')
-
-            # Calcul du niveau arbitre à partir de la catégorie
-            arbitres_dispo['CATEGORIE'] = arbitres_dispo['CATEGORIE'].str.upper()
-            arbitres_dispo['NIVEAU'] = arbitres_dispo['CATEGORIE'].map(categorie_niveau)
-
-            # Filtrage des arbitres compatibles
-            arbitres_eligibles = arbitres_dispo[
-                arbitres_dispo['NIVEAU'].apply(lambda x: niveau_min <= x <= niveau_max if pd.notna(x) else False)
-            ]
-
-            st.subheader("Arbitres proposés")
-            if not arbitres_eligibles.empty:
-                st.dataframe(arbitres_eligibles[['NOM', 'PRENOM', 'NO LICENCE', 'CATEGORIE', 'NIVEAU']])
-            else:
-                st.warning("Aucun arbitre disponible et compatible avec le niveau requis.")
+        st.warning("Aucun arbitre disponible et compatible avec le niveau requis.")
