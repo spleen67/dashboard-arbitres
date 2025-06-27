@@ -71,8 +71,8 @@ def charger_rencontres():
     return nettoyer_colonnes(df)
 
 @st.cache_data
-def charger_categories():
-    url = "https://docs.google.com/spreadsheets/d/1UcqLFBIxXPWS31O2pyT3Xc5lha7_vjAq/export?format=xlsx"
+def charger_arbitres():
+    url = "https://docs.google.com/spreadsheets/d/1UUZBFPMCkVGzVKeTP_D44ZpGwTHlu0Q0/export?format=xlsx"
     df = pd.read_excel(url)
     return nettoyer_colonnes(df)
 
@@ -88,7 +88,7 @@ def charger_disponibilites():
 
 # Chargement
 rencontres = charger_rencontres()
-categories = charger_categories()
+arbitres = charger_arbitres()
 disponibilites = charger_disponibilites()
 
 # Sélection d'une rencontre
@@ -110,19 +110,20 @@ if rencontre_id:
     dispo_date = disponibilites[disponibilites['DATE'] == date_rencontre]
     dispo_oui = dispo_date[dispo_date['DISPONIBILITE'] == "OUI"]
 
-    # Ajout du niveau arbitre
-    categories['CATEGORIE'] = categories['CATEGORIE'].str.upper()
-    categories['NIVEAU'] = categories['CATEGORIE'].map(categorie_niveau)
-    arbitres = pd.merge(dispo_oui, categories[['NUMERO AFFILIATION', 'NIVEAU']], 
-                        left_on='NO LICENCE', right_on='NUMERO AFFILIATION', how='left')
+    # Jointure avec la table des arbitres
+    arbitres_dispo = pd.merge(dispo_oui, arbitres, left_on='NO LICENCE', right_on='NUMERO AFFILIATION', how='left')
+
+    # Calcul du niveau arbitre à partir de la catégorie
+    arbitres_dispo['CATEGORIE'] = arbitres_dispo['CATEGORIE'].str.upper()
+    arbitres_dispo['NIVEAU'] = arbitres_dispo['CATEGORIE'].map(categorie_niveau)
 
     # Filtrage des arbitres compatibles
-    arbitres_eligibles = arbitres[
-        arbitres['NIVEAU'].apply(lambda x: niveau_min <= x <= niveau_max if pd.notna(x) else False)
+    arbitres_eligibles = arbitres_dispo[
+        arbitres_dispo['NIVEAU'].apply(lambda x: niveau_min <= x <= niveau_max if pd.notna(x) else False)
     ]
 
     st.subheader("Arbitres proposés")
     if not arbitres_eligibles.empty:
-        st.dataframe(arbitres_eligibles[['NOM', 'PRENOM', 'NO LICENCE', 'NIVEAU']])
+        st.dataframe(arbitres_eligibles[['NOM', 'PRENOM', 'NO LICENCE', 'CATEGORIE', 'NIVEAU']])
     else:
         st.warning("Aucun arbitre disponible et compatible avec le niveau requis.")
