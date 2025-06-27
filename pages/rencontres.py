@@ -135,4 +135,5 @@ def afficher_affectation():
         st.warning("Aucun arbitre disponible et compatible avec le niveau requis.")
 
 # Lancer l'application
-afficher_affectation()
+if __name__ == "__main__":
+    afficher_affectation()
